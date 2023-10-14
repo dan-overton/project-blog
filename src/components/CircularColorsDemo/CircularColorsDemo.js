@@ -1,62 +1,72 @@
-import React from 'react';
-import clsx from 'clsx';
-import {
-  Play,
-  Pause,
-  RotateCcw,
-} from 'react-feather';
+"use client";
+import clsx from "clsx";
+import { motion } from "framer-motion";
+import React from "react";
+import { Pause, Play, RotateCcw } from "react-feather";
 
-import Card from '@/components/Card';
-import VisuallyHidden from '@/components/VisuallyHidden';
+import Card from "@/components/Card";
+import VisuallyHidden from "@/components/VisuallyHidden";
 
-import styles from './CircularColorsDemo.module.css';
+import styles from "./CircularColorsDemo.module.css";
 
 const COLORS = [
-  { label: 'red', value: 'hsl(348deg 100% 60%)' },
-  { label: 'yellow', value: 'hsl(50deg 100% 55%)' },
-  { label: 'blue', value: 'hsl(235deg 100% 65%)' },
+  { label: "red", value: "hsl(348deg 100% 60%)" },
+  { label: "yellow", value: "hsl(50deg 100% 55%)" },
+  { label: "blue", value: "hsl(235deg 100% 65%)" },
 ];
 
 function CircularColorsDemo() {
-  // TODO: This value should increase by 1 every second:
-  const timeElapsed = 0;
+  const [playing, setPlaying] = React.useState(false);
+  const [timeElapsed, setTimeElapsed] = React.useState(0);
 
-  // TODO: This value should cycle through the colors in the
-  // COLORS array:
-  const selectedColor = COLORS[0];
+  function reset() {
+    setTimeElapsed(0);
+    setPlaying(false);
+  }
+
+  React.useEffect(() => {
+    let interval = null;
+    if (playing) {
+      setTimeElapsed((t) => t + 1);
+      interval = setInterval(() => {
+        setTimeElapsed((t) => t + 1);
+      }, 1000);
+    }
+
+    return () => {
+      if (interval !== null) {
+        clearInterval(interval);
+        interval = null;
+      }
+    };
+  }, [playing]);
+
+  const selectedColor = COLORS[timeElapsed % 3];
 
   return (
     <Card as="section" className={styles.wrapper}>
       <ul className={styles.colorsWrapper}>
         {COLORS.map((color, index) => {
-          const isSelected =
-            color.value === selectedColor.value;
+          const isSelected = color.value === selectedColor.value;
 
           return (
-            <li
-              className={styles.color}
-              key={index}
-            >
+            <li className={styles.color} key={index}>
               {isSelected && (
-                <div
-                  className={
-                    styles.selectedColorOutline
-                  }
+                <motion.div
+                  layoutId="selected-color"
+                  className={styles.selectedColorOutline}
                 />
               )}
               <div
                 className={clsx(
                   styles.colorBox,
-                  isSelected &&
-                    styles.selectedColorBox
+                  isSelected && styles.selectedColorBox
                 )}
                 style={{
                   backgroundColor: color.value,
                 }}
               >
-                <VisuallyHidden>
-                  {color.label}
-                </VisuallyHidden>
+                <VisuallyHidden>{color.label}</VisuallyHidden>
               </div>
             </li>
           );
@@ -69,11 +79,11 @@ function CircularColorsDemo() {
           <dd>{timeElapsed}</dd>
         </dl>
         <div className={styles.actions}>
-          <button>
-            <Play />
-            <VisuallyHidden>Play</VisuallyHidden>
+          <button onClick={() => setPlaying(!playing)}>
+            {playing ? <Pause /> : <Play />}
+            <VisuallyHidden>{playing ? "Pause" : "Play"}</VisuallyHidden>
           </button>
-          <button>
+          <button onClick={() => reset()}>
             <RotateCcw />
             <VisuallyHidden>Reset</VisuallyHidden>
           </button>

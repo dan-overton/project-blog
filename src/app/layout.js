@@ -1,44 +1,44 @@
-import React from 'react';
-import {
-  Work_Sans,
-  Spline_Sans_Mono,
-} from 'next/font/google';
-import clsx from 'clsx';
+import clsx from "clsx";
+import { Spline_Sans_Mono, Work_Sans } from "next/font/google";
+import { cookies } from "next/headers";
 
-import { LIGHT_TOKENS, DARK_TOKENS } from '@/constants';
+import { DARK_TOKENS, LIGHT_TOKENS, THEME_COOKIE_NAME } from "@/constants";
 
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import './styles.css';
-
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import ReduceMotionContainer from "@/components/ReduceMotionContainer";
+import "./styles.css";
 const mainFont = Work_Sans({
-  subsets: ['latin'],
-  display: 'fallback',
-  weight: 'variable',
-  variable: '--font-family',
+  subsets: ["latin"],
+  display: "fallback",
+  weight: "variable",
+  variable: "--font-family",
 });
 const monoFont = Spline_Sans_Mono({
-  subsets: ['latin'],
-  display: 'fallback',
-  weight: 'variable',
-  variable: '--font-family-mono',
+  subsets: ["latin"],
+  display: "fallback",
+  weight: "variable",
+  variable: "--font-family-mono",
 });
 
 function RootLayout({ children }) {
-  // TODO: Dynamic theme depending on user preference
-  const theme = 'light';
+  const cookieStore = cookies();
+  const themeCookie = cookieStore.get(THEME_COOKIE_NAME);
+  const theme = themeCookie?.value || "light";
 
   return (
     <html
       lang="en"
       className={clsx(mainFont.variable, monoFont.variable)}
       data-color-theme={theme}
-      style={theme === 'light' ? LIGHT_TOKENS : DARK_TOKENS}
+      style={theme === "light" ? LIGHT_TOKENS : DARK_TOKENS}
     >
       <body>
-        <Header theme={theme} />
-        <main>{children}</main>
-        <Footer />
+        <ReduceMotionContainer>
+          <Header theme={theme} />
+          <main>{children}</main>
+          <Footer />
+        </ReduceMotionContainer>
       </body>
     </html>
   );
